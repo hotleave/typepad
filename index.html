@@ -14,6 +14,7 @@
 <div class="editor hidden">
    <div class="container">
       <input oninput="editor.changeTitle(this)" class="editor-title" type="text" placeholder="标题">
+      <input oninput="editor.changeParagraph(this)" class="editor-paragraph" type="text" placeholder="段落">
       <textarea oninput="editor.changeContent(this)" class="editor-content" name="editor" id="editor" cols="30" rows="10" placeholder="这里填写内容"></textarea>
       <div class="editor-toolbar">
          <div class="btn-group">
@@ -301,6 +302,7 @@
                <th>字数</th>
                <th>类型</th>
                <th>文章</th>
+               <th>段落</th>
                <th class="hidden-sm">开始时间</th>
                <th>用时</th>
                <th>操作 <a class="link hidden-sm" onclick="engine.clear(this)">清除</a></th>

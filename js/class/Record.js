@@ -3,13 +3,14 @@ define(['Utility', 'ArticleType'], function (Utility,ArticleType) {
     * 打字记录
     */
    class Record {
-      constructor(speed, codeLength, hitRate, backspace, wordCount, articleName,  timeStart, duration) {
+      constructor(speed, codeLength, hitRate, backspace, wordCount, articleName, chapter, timeStart, duration) {
          this.speed       = speed;
          this.codeLength  = codeLength;
          this.hitRate     = hitRate;
          this.backspace   = backspace;
          this.wordCount   = wordCount;
          this.articleName = articleName
+         this.chapter     = chapter
          this.timeStart   = timeStart;
          this.duration    = duration;
       }
@@ -36,9 +37,11 @@ define(['Utility', 'ArticleType'], function (Utility,ArticleType) {
               <td>${this.wordCount}</td><!--字数-->
               <td class="text-center ${textClass}">${articleType}</td><!--文章类型-->
               <td>${articleName}</td><!--文章名称-->
+              <td>${this.chapter}</td>
               <td class="hidden-sm">${Utility.dateFormatter(new Date(this.timeStart))}</td><!--开始时间-->
               <td class="time">${Utility.formatTimeLeft(this.duration)}</td><!--用时-->
-              <td><button class="btn btn-danger btn-sm" onclick="engine.delete(${config.IDBIndex}, this)" type="button">删除</button></td>
+              <td><button class="btn btn-danger btn-sm" onclick="engine.delete(${config.IDBIndex}, this)" type="button">删除</button>
+              <button class="btn btn-danger btn-sm" onclick="engine.copyResult(${config.IDBIndex}, this)" type="button">Copy</button></td>
             </tr>`;
       }
    }

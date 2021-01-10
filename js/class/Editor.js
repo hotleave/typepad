@@ -3,15 +3,31 @@ define(['Reg', 'ArticleType', 'Article'], function (Reg,ArticleType, Article){
       constructor(title, content) {
          this.title = title || '';
          this.content = content || '';
+         this.paragraph = Article.customize.value;
          this.symbolEn =  0;
          this.symbolZh =  0;
+
+         const self = this;
+         $('.editor').addEventListener('paste', function (e) {
+            e.preventDefault();
+
+            var clipboardData = e.clipboardData;
+            if (!(clipboardData && clipboardData.items)) {//是否有粘贴内容
+                return;
+            }
+
+            var pasteContent = e.clipboardData.getData('text/plain');
+            self.parseContent(pasteContent)
+        })
       }
       show(config){
          $('.editor').classList.remove('hidden');
          this.title = config.customizedTitle;
          this.content = config.customizedContent;
+         this.paragraph = config.customizedParagraph;
          $('.editor-title').value = this.title;
          $('.editor-content').value = this.content;
+         $('.editor-paragraph').value = this.paragraph;
 
          // 避免主页滚动
          let app = $('body');
@@ -34,11 +50,14 @@ define(['Reg', 'ArticleType', 'Article'], function (Reg,ArticleType, Article){
          }
          engine.config.customizedContent = this.content;
          engine.config.customizedTitle = this.title;
-         engine.config.articleIdentifier = Article.customize.value;
+         engine.config.customizedParagraph = this.paragraph; 
+         engine.config.articleIdentifier = this.paragraph;
          engine.config.articleName = this.title
          engine.config.articleType = ArticleType.customize
          engine.config.article = this.content;
          engine.config.save();
+
+         Article.customize.value = this.paragraph;
          engine.loadArticleOptions();
          engine.applyConfig();
          this.hide();
@@ -96,12 +115,31 @@ define(['Reg', 'ArticleType', 'Article'], function (Reg,ArticleType, Article){
          $('#countCharacter').innerText = this.content ? this.content.length: 0;
       }
 
+      parseContent(content) {
+         let lines = content.split('\r');
+         let config = {};
+         if (lines.length >= 3) {
+            config.customizedTitle = lines[0]
+            config.customizedContent = lines[1]
+            config.customizedParagraph = lines.pop().replace(/-+第(\d+)段.*/, '$1')
+         } else if (lines.length === 2) {
+            config.customizedContent = lines[0]
+            config.customizedParagraph = lines.pop().replace(/-+第(\d+)段.*/, '$1')
+         } else {
+            config.customizedContent = content
+         }
+         this.show(config);
+      }
+
       changeTitle(sender){
          this.title = sender.value
       }
       changeContent(sender){
          this.content = sender.value;
          this.updateInfo();
+      }
+      changeParagraph(sender) {
+         this.paragraph = sender.value;
       }
    }
    return Editor

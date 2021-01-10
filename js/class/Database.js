@@ -41,8 +41,9 @@ define(['Utility', 'ArticleType'], function (Utility, ArticleType) {
                hitRate           : record.hitRate,
                backspace         : record.backspace,
                wordCount         : record.wordCount,
-               articleIdentifier : config.articleIdentifier,
+               articleIdentifier  : config.articleIdentifier,
                articleName       : articleName,
+               chapter           : config.chapter,
                timeStart         : record.timeStart,
                duration          : record.duration,
                articleType       : config.articleType,
@@ -111,6 +112,7 @@ define(['Utility', 'ArticleType'], function (Utility, ArticleType) {
               <td>${cursor.value.wordCount}</td>
               <td class="text-center ${textClass}"">${articleType}</td>
               <td>${cursor.value.articleName ? cursor.value.articleName : ''}</td>
+              <td>${cursor.value.chapter ? cursor.value.chapter : ''}</td>
               <td class="hidden-sm time">${Utility.dateFormatter(new Date(cursor.value.timeStart))}</td>
               <td class="time">${Utility.formatTimeLeft(cursor.value.duration)}</td>
               <td><button class="btn btn-danger btn-sm" onclick="engine.delete(${cursor.key}, this)" type="button">删除</button></td>

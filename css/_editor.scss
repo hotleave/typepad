@@ -27,7 +27,7 @@
       @include box-shadow(0 0 0 3px transparentize($green, 0.5));
     }
   }
-  &-title{
+  &-title, &-chapter{
     font-size: $fz-editor-title;
   }
 

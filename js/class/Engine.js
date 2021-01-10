@@ -46,26 +46,36 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
           **** ⌘ + H: 重新开始
           ****/
          typingPad.onkeydown = e => {
-            if (e.key === 'Tab' || ((e.metaKey || e.ctrlKey) && (/[nqwefgplt]/.test(e.key)))) {
-               // 消除一些默认浏览器快捷键的效果
-               e.preventDefault();
-            } else if ((e.metaKey || e.ctrlKey) && e.key === 'y') {
-               e.preventDefault();
-               this.reset();
-            } else if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-               e.preventDefault();
-               this.shuffleCurrent();
-            } else if ((e.metaKey || e.ctrlKey) && e.key === 'u') {
-               this.prevChapter();
-               e.preventDefault();
-            } else if ((e.metaKey || e.ctrlKey) && e.key === 'j') {
-               this.nextChapter();
-               e.preventDefault();
-            } else if (e.key === 'Escape') {
+            if (e.key === 'Escape') {
                this.pause();
-               e.preventDefault();
-            } else if (Reg.KEYS.az.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey && !this.isStarted && !this.isFinished) {
+               return
+            }
+            if (Reg.KEYS.az.test(e.key) && !e.ctrlKey && !e.metaKey && !e.altKey && !this.isStarted && !this.isFinished) {
                this.start()
+               return;
+            }
+
+            if  (!e.metaKey && !e.altKey) {
+               return;
+            }
+
+            e.preventDefault();
+            switch (e.key) {
+               case 'y':
+                  this.reset();
+                  break;
+               case 'k':
+                  this.shuffleCurrent();
+                  break;
+               case 'u':
+                  this.prevChapter();
+                  break;
+               case 'j':
+                  this.nextChapter();
+                  break;
+               case 'c':
+                  this.copyResult();
+                  break;
             }
          }
          typingPad.onkeyup = e => {
@@ -237,7 +247,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
             let article = Article[itemName];
             let tempHtml = '';
             if (article.type === ArticleType.customize){
-               tempHtml = `<option value="${itemName}">${ArticleType.getTypeNameWith(article.type)} - ${this.config.customizedTitle}</option>`
+               tempHtml = `<option value="${article.value}">${ArticleType.getTypeNameWith(article.type)} - ${this.config.customizedTitle}</option>`
             } else {
                tempHtml = `<option value="${itemName}">${ArticleType.getTypeNameWith(article.type)} - ${article.name}</option>`
             }
@@ -255,10 +265,12 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
             articleIdentifier: this.config.articleIdentifier,
             articleName: this.config.articleName,
             articleType: this.config.articleType,
+            articleParagraph: this.config.customizedParagraph
          }
          this.config.articleIdentifier = articleName;
          this.config.articleName = article.name;
          this.config.articleType = article.type;
+         this.config.articleParagraph = artitle.paragraph;
          switch (this.config.articleType) {
             case ArticleType.character:
                this.currentOriginWords = this.config.isShuffle ? Utility.shuffle(article.content.split('')) : article.content.split('');
@@ -286,6 +298,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
                   this.config.articleIdentifier = lastConfig.articleIdentifier;
                   this.config.articleName = lastConfig.articleName;
                   this.config.articleType = lastConfig.articleType;
+                  this.config.articleParagraph = lastConfig.articleParagraph;
                   editor.show(this.config);
                } else {
                   this.config.article = this.config.customizedContent;
@@ -660,6 +673,10 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
          this.updateInfo();
       }
 
+      copyResult(id) {
+         console.log(record, this.config)
+      }
+
       // 更新界面信息
       updateInfo() {
          // COLOR
@@ -710,7 +727,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
          }
 
          // OPTION
-         $('.chapter-current').innerText = this.config.chapter;
+         record.chapter = $('.chapter-current').innerText = this.config.chapter;
          $('.chapter-total').innerText = this.config.chapterTotal;
       }
    }
