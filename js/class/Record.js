@@ -40,8 +40,7 @@ define(['Utility', 'ArticleType'], function (Utility,ArticleType) {
               <td>${this.chapter}</td>
               <td class="hidden-sm">${Utility.dateFormatter(new Date(this.timeStart))}</td><!--开始时间-->
               <td class="time">${Utility.formatTimeLeft(this.duration)}</td><!--用时-->
-              <td><button class="btn btn-danger btn-sm" onclick="engine.delete(${config.IDBIndex}, this)" type="button">删除</button>
-              <button class="btn btn-danger btn-sm" onclick="engine.copyResult(${config.IDBIndex}, this)" type="button">Copy</button></td>
+              <td><button class="btn btn-danger btn-sm" onclick="engine.delete(${config.IDBIndex}, this)" type="button">删除</button></td>
             </tr>`;
       }
    }

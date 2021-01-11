@@ -12,7 +12,7 @@
     max-width: $separate-width;
     padding: 30px;
   }
-  &-content, &-title{
+  &-content, &-title, &-paragraph{
     margin-bottom: 20px;
     border: 1px solid $color-border;
     display: block;
@@ -27,7 +27,7 @@
       @include box-shadow(0 0 0 3px transparentize($green, 0.5));
     }
   }
-  &-title, &-chapter{
+  &-title, &-paragraph{
     font-size: $fz-editor-title;
   }
 

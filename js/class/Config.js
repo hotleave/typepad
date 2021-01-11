@@ -28,6 +28,7 @@ define(['Article', 'ArticleType'],function (Article, ArticleType) {
             // v2.3 自定义内容
             this.customizedContent  = config.customizedContent || '';
             this.customizedTitle    = config.customizedTitle || '';
+            this.customizedParagraph = config.customizedParagraph;
          } else {
             this.chapter            = 1;                      // 当前段号
             this.chapterTotal       = 1;                      // 总段数
@@ -49,6 +50,7 @@ define(['Article', 'ArticleType'],function (Article, ArticleType) {
             // v2.3 自定义内容
             this.customizedTitle    =  '';                    // 自定义文章标题
             this.customizedContent  =  '';                    // 自定义文章内容
+            this.customizedParagraph = '';
          }
 
          // 更新处理

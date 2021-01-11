@@ -37,6 +37,18 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
          this.config = new Config();
 
 
+         document.addEventListener('paste', e => {
+            e.preventDefault();
+
+            var clipboardData = e.clipboardData;
+            if (!(clipboardData && clipboardData.items)) {//是否有粘贴内容
+                return;
+            }
+
+            var pasteContent = e.clipboardData.getData('text/plain');
+            console.log(pasteContent)
+            this.loadFromClipboard(pasteContent)
+        })
          // 按键过滤器
          /****
           **** ⌘ + R: 重打当前段
@@ -270,7 +282,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
          this.config.articleIdentifier = articleName;
          this.config.articleName = article.name;
          this.config.articleType = article.type;
-         this.config.articleParagraph = artitle.paragraph;
+         this.config.articleParagraph = article.paragraph;
          switch (this.config.articleType) {
             case ArticleType.character:
                this.currentOriginWords = this.config.isShuffle ? Utility.shuffle(article.content.split('')) : article.content.split('');
@@ -671,10 +683,36 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
             }
          }
          this.updateInfo();
+
+         this.copyResult();
       }
 
-      copyResult(id) {
-         console.log(record, this.config)
+      copyResult() {
+         let result = `第${this.config.customizedParagraph || this.config.chapter}段 速度${record.speed} 击键${record.hitRate} 码长${record.codeLength} 字数${record.wordCount} 回改${record.backspace} 时间${Utility.formatTimeLeft(record.duration)} 玫枫跟打器-2.32`
+         function handler(event) {
+            event.clipboardData.setData('text/plain', result);
+            document.removeEventListener('copy', handler, true);
+            event.preventDefault();
+         }
+         document.addEventListener('copy', handler, true);
+         document.execCommand('copy');
+      }
+
+      loadFromClipboard(content) {
+         let lines = content.split(/[\r\n]/);
+         let config = {};
+         if (lines.length >= 3) {
+            config.customizedTitle = lines[0]
+            config.customizedContent = lines[1]
+            config.customizedParagraph = lines.pop().replace(/-+第(\d+)段.*/, '$1')
+         } else if (lines.length === 2) {
+            config.customizedContent = lines[0]
+            config.customizedParagraph = lines.pop().replace(/-+第(\d+)段.*/, '$1')
+         } else {
+            config.customizedContent = content
+         }
+         editor.show(config)
+         editor.done(this)
       }
 
       // 更新界面信息

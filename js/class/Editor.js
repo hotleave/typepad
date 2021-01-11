@@ -116,7 +116,7 @@ define(['Reg', 'ArticleType', 'Article'], function (Reg,ArticleType, Article){
       }
 
       parseContent(content) {
-         let lines = content.split('\r');
+         let lines = content.split(/[\r\n]/);
          let config = {};
          if (lines.length >= 3) {
             config.customizedTitle = lines[0]
