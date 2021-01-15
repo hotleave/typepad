@@ -94,7 +94,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
             e.preventDefault();
             if (!this.isFinished && this.isStarted) {
                keyCount.countKeys(e);
-               this.compare();
+               this.compare(e);
                // 末字时结束的时候
                if (typingPad.value.length >= this.currentWords.length) {
                   if (typingPad.value === this.currentWords) {
@@ -105,7 +105,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
          }
          typingPad.oninput = e => {
             if (!this.isFinished && this.isStarted) {
-               this.compare();
+               this.compare(e);
                // 末字时结束的时候
                if (typingPad.value.length >= this.currentWords.length) {
                   if (typingPad.value === this.currentWords) {
@@ -460,7 +460,11 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
       }
 
       // 对比上屏字
-      compare() {
+      compare(e) {
+         if (e.isComposing) {
+            return
+         }
+
          this.correctWordsCount = 0;
          let typedWords = typingPad.value;
          let arrayOrigin = this.currentWords.split('');
@@ -481,25 +485,26 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
             let currentCharacterIsCorrect = current === origin;
             let currentCharacterIsEnglish = /[a-zA-Z]/i.test(current);
 
-            // 英文或单词时
-            if (this.config.articleType === ArticleType.word || this.config.articleType === ArticleType.english) {
-               if (currentCharacterIsCorrect) {
-                  this.correctWordsCount++;
-                  wordsCorrect = wordsCorrect.concat(origin);
-               } else {
-                  wordsWrong = wordsWrong.concat(origin);
-               }
+
+            if (currentCharacterIsCorrect) {
+               this.correctWordsCount++;
+               wordsCorrect = wordsCorrect.concat(origin);
             } else {
-               // 汉字内容时
-               if (currentCharacterIsCorrect) {
-                  this.correctWordsCount++;
-                  wordsCorrect = wordsCorrect.concat(origin);
-               } else if (currentCharacterIsEnglish) { // 错误且是英文时，隐藏不显示
-                  tempCharacterLength++
-               } else { // 错字时显示红色
-                  wordsWrong = wordsWrong.concat(origin);
-               }
+               wordsWrong = wordsWrong.concat(origin);
             }
+            // 英文或单词时
+            // if (this.config.articleType === ArticleType.word || this.config.articleType === ArticleType.english) {
+            // } else {
+            //    // 汉字内容时
+            //    if (currentCharacterIsCorrect) {
+            //       this.correctWordsCount++;
+            //       wordsCorrect = wordsCorrect.concat(origin);
+            //    } else if (currentCharacterIsEnglish) { // 错误且是英文时，隐藏不显示
+            //       tempCharacterLength++
+            //    } else { // 错字时显示红色
+            //       wordsWrong = wordsWrong.concat(origin);
+            //    }
+            // }
 
             if (wordsCorrect && !lastCharacterIsCorrect && index) {
                html = html.concat(`<span class="wrong">${wordsWrong}</span>`);
@@ -524,7 +529,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
 
          // 滚动对照区到当前所输入的位置
          let offsetTop = $('.' + untypedStringClassName).offsetTop;
-         templateWrapper.scrollTo(0, offsetTop - HEIGHT_TEMPLATE / 2);
+         templateWrapper.scrollTo(0, offsetTop === 0 ? 0 : offsetTop - HEIGHT_TEMPLATE / 2 - 32);
 
 
          if (this.config.articleType === ArticleType.word) {

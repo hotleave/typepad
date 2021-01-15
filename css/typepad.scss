@@ -48,9 +48,6 @@ body{
   }
 }
 
-.translation{
-
-}
 .translation-panel{
   z-index: $z-toast;
   white-space: nowrap;
@@ -80,7 +77,7 @@ body{
     white-space: pre-wrap;
     border: 1px solid $color-border;
     resize: none;
-    height: 100px;
+    height: 6em;
     width: 100%;
     padding: 10px;
     display: block;
