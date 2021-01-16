@@ -104,6 +104,15 @@ body{
   }
   .wrong{
     background-color: $red;
+    color: white;
+    white-space: inherit;
+  }
+  .wrong:last-child{
+    background-color: transparent;
+    color: inherit;
+  }
+  .added{
+    background-color: $green;
     color: white !important;
     white-space: inherit;
   }

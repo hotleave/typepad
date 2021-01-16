@@ -1399,6 +1399,17 @@ body {
 
 .text .wrong {
   background-color: #FF3B30;
+  color: white;
+  white-space: inherit;
+}
+
+.text .wrong:last-child {
+  background-color: transparent;
+  color: inherit;
+}
+
+.text .added {
+  background-color: #26c57d;
   color: white !important;
   white-space: inherit;
 }

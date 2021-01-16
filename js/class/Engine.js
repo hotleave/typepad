@@ -46,7 +46,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
             }
 
             var pasteContent = e.clipboardData.getData('text/plain');
-            console.log(pasteContent)
+            // console.log(pasteContent)
             this.loadFromClipboard(pasteContent)
         })
          // 按键过滤器
@@ -467,74 +467,43 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
 
          this.correctWordsCount = 0;
          let typedWords = typingPad.value;
-         let arrayOrigin = this.currentWords.split('');
-         let arrayTyped = typedWords.split('');
          let html = '';
-         let lastCharacterIsCorrect = false; // 上一个字符是正确的
-         let wordsCorrect = '';
-         let wordsWrong = '';
-         let tempCharacterLength = 0; // 单字或汉字文章时，未上屏结尾英文的长度
-         /**
-          * 对与错的词成块化，
-          * 如果上一个字跟当前字的对错一致，追加该字到对应字符串，
-          * 如果不是，输出相反字符串
-          */
-         arrayTyped.forEach((current, index) => {
-            let origin = arrayOrigin[index];
-            origin = origin ? origin : ' '; // 当输入编码多于原字符串时，可能会出现 undefined 字符，这个用于消除它
-            let currentCharacterIsCorrect = current === origin;
-            let currentCharacterIsEnglish = /[a-zA-Z]/i.test(current);
 
-
-            if (currentCharacterIsCorrect) {
-               this.correctWordsCount++;
-               wordsCorrect = wordsCorrect.concat(origin);
-            } else {
-               wordsWrong = wordsWrong.concat(origin);
-            }
-            // 英文或单词时
-            // if (this.config.articleType === ArticleType.word || this.config.articleType === ArticleType.english) {
-            // } else {
-            //    // 汉字内容时
-            //    if (currentCharacterIsCorrect) {
-            //       this.correctWordsCount++;
-            //       wordsCorrect = wordsCorrect.concat(origin);
-            //    } else if (currentCharacterIsEnglish) { // 错误且是英文时，隐藏不显示
-            //       tempCharacterLength++
-            //    } else { // 错字时显示红色
-            //       wordsWrong = wordsWrong.concat(origin);
-            //    }
-            // }
-
-            if (wordsCorrect && !lastCharacterIsCorrect && index) {
-               html = html.concat(`<span class="wrong">${wordsWrong}</span>`);
-               wordsWrong = '';
-            } else if (wordsWrong && lastCharacterIsCorrect && index) {
-               html = html.concat(`<span class="correct">${wordsCorrect}</span>`);
-               wordsCorrect = '';
-            }
-            if ((index + 1) === typedWords.length) {
-               if (wordsCorrect) {
-                  html = html.concat(`<span class="correct">${wordsCorrect}</span>`);
-               } else {
-                  html = html.concat(`<span class="wrong">${wordsWrong}</span>`);
+         let diffs = Diff.diffChars(this.currentWords, typedWords)
+         // console.log(diffs)
+         for (let i = 0, length = diffs.length; i < length; i++) {
+            let { added, removed, count, value } = diffs[i];
+            let style = ''
+            if (!added && !removed) {
+               this.correctWordsCount += count
+               style = 'correct'
+            } else if (removed) {
+               let next = diffs[i + 1]
+               if (next && next.added) {
+                  // 将added移到removed前
+                  html += `<span class="added">${next.value}</span>`
+                  i++
                }
+               style = 'wrong'
+            } else {
+               style = 'added'
             }
-            lastCharacterIsCorrect = current === origin;
-         });
-         let untypedString = this.currentWords.substring(arrayTyped.length - tempCharacterLength)
-         let untypedHtml = `<span class='${untypedStringClassName}'>${untypedString}</span>`;
-         html = html.concat(untypedHtml)
+
+            html += `<span class="${style}">${value}</span>`
+         }
+
          template.innerHTML = html;
 
          // 滚动对照区到当前所输入的位置
-         let offsetTop = $('.' + untypedStringClassName).offsetTop;
-         templateWrapper.scrollTo(0, offsetTop === 0 ? 0 : offsetTop - HEIGHT_TEMPLATE / 2 - 32);
-
+         let lastWrong = $('.wrong:last-child')
+         if (lastWrong) {
+            let offsetTop = lastWrong.offsetTop;
+            templateWrapper.scrollTo(0, offsetTop === 0 ? 0 : offsetTop - HEIGHT_TEMPLATE / 2 - 32);
+         }
 
          if (this.config.articleType === ArticleType.word) {
             // 获取单词释义
-            this.getCurrentCETWordTranslation(arrayTyped.length);
+            this.getCurrentCETWordTranslation(typedWords.length);
          }
       }
 
@@ -718,6 +687,7 @@ define(['Reg','ArticleType','Article', 'Config', 'Record', 'Database', 'KeyCount
          }
          editor.show(config)
          editor.done(this)
+         this.reset()
       }
 
       // 更新界面信息
